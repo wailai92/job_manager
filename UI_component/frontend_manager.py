@@ -42,13 +42,14 @@ class UI_Manager():
         self.output_manager = Output_manager(self.output_frame)
         
         self.input_manager.bind_add(self.on_add)
+        self.input_manager.bind_delete(self.on_delete)
         self.input_manager.bind_refresh(self.refresh_view)
         
         self.backend_manager.add_job("TEST", 2, time.time() + 3600)  #test
         
         jobs = self.backend_manager.list_jobs("score")
         self.output_manager.render(jobs)
-        self.sorted_by = "score"
+        self.sorted_by = "id"
         self.refresh_view()
         self.update_state()
     def update_state(self):
@@ -60,27 +61,21 @@ class UI_Manager():
         self.output_manager.render(jobs)
     
     def on_add(self):
-        name, prio, y, m, d, time_str = self.input_manager.get_form()
+        name, prio, deadline_ts, category = self.input_manager.get_form()
         if not name:
             messagebox.showwarning("Input", "Job name is empty.")
             return
-        try:
-            hh_str, mm_str = time_str.split(":")
-            hh = int(hh_str)
-            mm = int(mm_str)
-            if not (0 <= hh <= 23 and 0 <= mm <= 59):
-                raise ValueError
-        except Exception:
-            messagebox.showerror("Input", "Time format must be HH:MM (e.g. 18:30).")
-            return
-
-        dt = datetime(y, m, d, hh, mm, 0)
-        deadline_ts = dt.timestamp()
-
-        self.backend_manager.add_job(name, prio, deadline_ts)  
+        self.backend_manager.add_job(name, prio, deadline_ts, category)  
         self.input_manager.clear_form()
         self.refresh_view()
-    
+    def on_delete(self):
+        job_id = self.output_manager.get_selected_id()
+        if not job_id:
+            messagebox.showwarning("select delete", "Unknown error")
+            return
+        self.backend_manager.delete_job_by_id(job_id)
+        self.refresh_view()
+        
     def set_sort(self, sorted_by):
         self.sorted_by = sorted_by
         self.refresh_view()
@@ -101,9 +96,9 @@ class UI_Manager():
         self.style.configure("Main.TCombobox", padding=6)
 
         # ===== Buttons =====
-        self.style.configure("Primary.TButton", padding=(12, 8), font=("Segoe UI", 11, "bold"))
-        self.style.configure("Secondary.TButton", padding=(12, 8), font=("Segoe UI", 11))
-        self.style.configure("Danger.TButton", padding=(12, 8), font=("Segoe UI", 11, "bold"))
+        self.style.configure("Primary.TButton", padding=(0, 0), font=("Segoe UI", 11, "bold"))
+        self.style.configure("Secondary.TButton", padding=(0, 0), font=("Segoe UI", 11))
+        self.style.configure("Danger.TButton", padding=(0, 0), font=("Segoe UI", 11, "bold"))
 
         # 讓按鈕有 hover / pressed 感（不同 theme 支援度不同）
         self.style.map("Primary.TButton",

@@ -9,22 +9,24 @@ class Output_manager:
         self.frame.pack(side="top", fill="both", expand=True)
 
         # 建立 Treeview（表格）
-        columns = ("id", "jobname", "priority", "deadline", "score")
+        columns = ("id", "category", "jobname", "priority", "deadline", "score")
         self.tree = ttk.Treeview(self.frame, columns=columns, show="headings")
 
         # 設定表頭文字
-        self.tree.heading("id", text="ID")
-        self.tree.heading("jobname", text="Job Name")
-        self.tree.heading("priority", text="Priority")
-        self.tree.heading("deadline", text="Deadline")
-        self.tree.heading("score", text="Score")
+        self.tree.heading("id", text="ID", anchor="center")
+        self.tree.heading("category", text="Categories", anchor="center")
+        self.tree.heading("jobname", text="Job Name", anchor="center")
+        self.tree.heading("priority", text="Priority", anchor="center")
+        self.tree.heading("deadline", text="Deadline", anchor="center")
+        self.tree.heading("score", text="Score", anchor="center")
 
         # 欄寬（先給個基本值）
         self.tree.column("id", width=60, anchor="center")
-        self.tree.column("jobname", width=320, anchor="w")
-        self.tree.column("priority", width=80, anchor="center")
+        self.tree.column("category", width=100, anchor="center")
+        self.tree.column("jobname", width=120, anchor="center")
+        self.tree.column("priority", width=40, anchor="center")
         self.tree.column("deadline", width=160, anchor="center")
-        self.tree.column("score", width=120, anchor="center")
+        self.tree.column("score", width=100, anchor="center")
 
         # 加 scrollbar（垂直）
         self.scroll_y = ttk.Scrollbar(self.frame, orient="vertical", command=self.tree.yview)
@@ -46,6 +48,7 @@ class Output_manager:
                 "end",
                 values=(
                     job.id,
+                    job.category,
                     job.jobname,
                     job.priority,
                     datetime.fromtimestamp(job.deadline).strftime("%Y/%m/%d %H:%M"),

@@ -4,9 +4,10 @@ import itertools
 counter = itertools.count()
 MAX_PRIORITY = 4
 class Job:
-    def __init__(self, jobname, priority, deadline, id) :
+    def __init__(self, jobname, priority, deadline, id, category = "None") :
         self.jobname = jobname
         self.id = id
+        self.category = category
         if priority < 0:
             self.priority = 0
         elif priority > MAX_PRIORITY:
@@ -60,10 +61,10 @@ class Job_manager:
         self.deadlineheap = Job_heap_deadline()
         #self.dirtycount = 0
         #self.last_score_update = 0.0
-    def insert(self, jobname, priority, deadline):
+    def insert(self, jobname, priority, deadline, category):
         id = self.jobcount + 1
         self.jobcount += 1
-        newjob = Job(jobname, priority, deadline, id)
+        newjob = Job(jobname, priority, deadline, id, category)
         self.dict[id] = newjob
         #self.jobname_by_id[id] = jobname
         if jobname not in self.id_by_jobname:
@@ -149,10 +150,11 @@ class Job_manager:
                     joblist.append(job)
             return joblist
         return []
-    def list_jobs(self, sort_by="score", reverse=False):
+    def list_jobs(self, sort_by="id", reverse=False):
         jobs = list(self.dict.values())
 
         key_map = {
+            "id":lambda j:j.id,
             "score": lambda j: j.score,
             "priority": lambda j: j.priority,
             "deadline": lambda j: j.deadline,

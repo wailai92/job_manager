@@ -38,8 +38,8 @@ class Backend_manager:
         self.job_manager.insert(jobname, priority, deadline)
         self.mark_dirty()
         return
-    def add_job(self, jobname, priority, deadline): #for ui
-        self.job_manager.insert(jobname, priority, deadline)
+    def add_job(self, jobname, priority, deadline, category = "None"): #for ui
+        self.job_manager.insert(jobname, priority, deadline, category)
         self.mark_dirty()
         return
     def cli_delete_jobs(self):    #for cli
