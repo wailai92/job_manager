@@ -89,13 +89,16 @@ class Input_manager:
         self.time_entry.grid(row=0, column=11, sticky="w", padx=6, pady=6)
 
         self.add_btn = ttk.Button(self.button_frame, text="Add", style="Primary.TButton")
-        self.add_btn.grid(row=1, column=0, padx=0, pady=0)
+        self.add_btn.grid(row=0, column=0, padx=0, pady=0)
         
         self.delete_btn = ttk.Button(self.button_frame, text="delete", style="Primary.TButton")
-        self.delete_btn.grid(row=1, column = 1, padx=0, pady=0)
+        self.delete_btn.grid(row=0, column = 1, padx=0, pady=0)
+        
+        self.edit_btn = ttk.Button(self.button_frame, text="edit", style="Primary.TButton")
+        self.edit_btn.grid(row=0, column=2, padx=0, pady=0)
 
         self.refresh_btn = ttk.Button(self.button_frame, text="Refresh", style="Primary.TButton")
-        self.refresh_btn.grid(row=1, column=2, padx=0, pady=0)
+        self.refresh_btn.grid(row=0, column=3, padx=0, pady=0)
 
         # 讓 job name 那欄可伸縮
         #self.frame.grid_columnconfigure(3, weight=1)
@@ -123,6 +126,9 @@ class Input_manager:
         
     def bind_delete(self, command):
         self.delete_btn.configure(command = command)
+    
+    def bind_edit(self, command):
+        self.edit_btn.configure(command = command)
 
     def bind_refresh(self, command):
         self.refresh_btn.configure(command=command)

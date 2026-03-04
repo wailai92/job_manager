@@ -58,6 +58,12 @@ class Backend_manager:
         self.job_manager.delete_by_id(job_id)
         self.mark_dirty()
         return
+    def update_job_by_id(self, values):
+        job_id, category, priority, deadline = values
+        self.job_manager.update_by_id(job_id, category, priority, deadline) 
+        self.mark_dirty(2)
+        return
+        
     def cli_search(self, key = "id"): #for cli
         if key == "id":
             try:

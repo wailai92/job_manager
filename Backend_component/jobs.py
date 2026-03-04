@@ -25,6 +25,9 @@ class Job:
         urgency = 1 / (time_remaining + 1)
         
         return P * (MAX_PRIORITY + 1) + urgency * (MAX_PRIORITY + 1) * 10
+    def job_attributes_set(self, values):
+        self.category, self.priority, self.deadline = values
+        self.score = self.compute_score()
 class heap:
     def __init__(self):
         self.heap = []
@@ -98,6 +101,11 @@ class Job_manager:
             if not s:
                 self.id_by_jobname.pop(name, None)
         return
+    def update_by_id(self, job_id, category, priority, deadline):
+        job = self.dict.get(job_id)
+        if job is not None:
+            self.dict[job_id].job_attributes_set((category, priority, deadline))
+            self.rebuild_heaps()
         
     def update_score(self):
         version = self.scoreheap.version + 1
@@ -108,6 +116,16 @@ class Job_manager:
         self.scoreheap.set_version(version)
         #self.dirtycount = 0
         #self.last_score_update = time.time()
+    def rebuild_heaps(self):
+        self.scoreheap.heap.clear()
+        self.priorityheap.heap.clear()
+        self.deadlineheap.heap.clear()
+        for job in self.dict.values():
+            # job.score 先確保是最新
+            job.score = job.compute_score()
+            self.scoreheap.push(job)
+            self.priorityheap.push(job)
+            self.deadlineheap.push(job)
         
     def get_top_score(self):
         while self.scoreheap.heap:

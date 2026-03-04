@@ -1,12 +1,13 @@
 from Backend_component.backend_manager import Backend_manager
 from UI_component.UI_input import Input_manager
 from UI_component.UI_output import Output_manager
+from UI_component.Edit_job_page import EditJobWindow
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import time
 from datetime import datetime
-
+  
 class Page():
     def __init__(self, page_type = ""):
         self.page =tk.Tk()
@@ -43,6 +44,7 @@ class UI_Manager():
         
         self.input_manager.bind_add(self.on_add)
         self.input_manager.bind_delete(self.on_delete)
+        self.input_manager.bind_edit(self.on_edit)
         self.input_manager.bind_refresh(self.refresh_view)
         
         self.backend_manager.add_job("TEST", 2, time.time() + 3600)  #test
@@ -57,6 +59,7 @@ class UI_Manager():
             self.refresh_view()  
         self.root.page.after(2000, self.update_state)
     def refresh_view(self):
+        #self.backend_manager.mark_dirty(self.backend_manager.dirtythreshold)
         jobs = self.backend_manager.list_jobs(self.sorted_by)
         self.output_manager.render(jobs)
     
@@ -71,10 +74,35 @@ class UI_Manager():
     def on_delete(self):
         job_id = self.output_manager.get_selected_id()
         if not job_id:
-            messagebox.showwarning("select delete", "Unknown error")
+            messagebox.showwarning("select delete", "No job selected")
             return
         self.backend_manager.delete_job_by_id(job_id)
         self.refresh_view()
+    def on_edit(self):
+        row = self.output_manager.get_selected_row()
+        if not row:
+            messagebox.showwarning("Edit", "請先選取一筆資料")
+            return
+
+        job_id = int(row[0])
+        job = self.backend_manager.job_manager.search_job_by_id(job_id)
+        if not job:
+            messagebox.showerror("Edit", "找不到該筆資料（可能已刪除）")
+            return
+
+        EditJobWindow(
+            master=self.root.page,
+            job=job[0],
+            on_save=self._apply_edit  # callback
+        )
+        
+        #self.backend_manager.update_job_by_id()
+        #self.refresh_view()
+    def _apply_edit(self, job_id, new_category, new_prio, new_deadline_ts):
+        # 更新 job 內容
+        self.backend_manager.update_job_by_id((job_id, new_category, new_prio, new_deadline_ts))
+        self.refresh_view()
+         
         
     def set_sort(self, sorted_by):
         self.sorted_by = sorted_by

@@ -63,3 +63,10 @@ class Output_manager:
             return None
         values = self.tree.item(sel[0], "values")
         return int(values[0])
+    def get_selected_row(self):
+        sel = self.tree.selection()
+        if not sel:
+            return None
+        values = self.tree.item(sel[0], "values")
+         # values = (id, category, jobname, priority, deadline, score)
+        return values
