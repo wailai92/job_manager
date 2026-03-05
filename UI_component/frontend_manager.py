@@ -47,11 +47,12 @@ class UI_Manager():
         self.input_manager.bind_edit(self.on_edit)
         self.input_manager.bind_refresh(self.refresh_view)
         
-        self.backend_manager.add_job("TEST", 2, time.time() + 3600)  #test
+        #self.backend_manager.add_job("TEST", 2, time.time() + 3600)  #test
         
         jobs = self.backend_manager.list_jobs("score")
         self.output_manager.render(jobs)
         self.sorted_by = "id"
+        self.root.page.protocol("WM_DELETE_WINDOW", self.on_close)
         self.refresh_view()
         self.update_state()
     def update_state(self):
@@ -62,6 +63,13 @@ class UI_Manager():
         #self.backend_manager.mark_dirty(self.backend_manager.dirtythreshold)
         jobs = self.backend_manager.list_jobs(self.sorted_by)
         self.output_manager.render(jobs)
+
+    def on_close(self):
+        try:
+            self.backend_manager.compact_now()
+        except:
+            print("compact failed")
+        self.root.page.destroy()
     
     def on_add(self):
         name, prio, deadline_ts, category = self.input_manager.get_form()
@@ -109,26 +117,21 @@ class UI_Manager():
         self.refresh_view()
         
     def setup_styles(self):
-        # 全域（設定 Treeview rowheight 等）
         self.style.configure(".", font=("Segoe UI", 11))
 
-        # ===== Frame / Label =====
         self.style.configure("Main.TFrame", padding=12)
         self.style.configure("Card.TFrame", padding=12, relief="solid", borderwidth=1)
 
         self.style.configure("Title.TLabel", font=("Segoe UI", 16, "bold"))
         self.style.configure("Hint.TLabel", font=("Segoe UI", 10))
 
-        # ===== Entry / Combobox =====
         self.style.configure("Main.TEntry", padding=6)
         self.style.configure("Main.TCombobox", padding=6)
 
-        # ===== Buttons =====
         self.style.configure("Primary.TButton", padding=(0, 0), font=("Segoe UI", 11, "bold"))
         self.style.configure("Secondary.TButton", padding=(0, 0), font=("Segoe UI", 11))
         self.style.configure("Danger.TButton", padding=(0, 0), font=("Segoe UI", 11, "bold"))
 
-        # 讓按鈕有 hover / pressed 感（不同 theme 支援度不同）
         self.style.map("Primary.TButton",
                 relief=[("pressed", "sunken"), ("active", "raised")])
         self.style.map("Secondary.TButton",
@@ -136,6 +139,5 @@ class UI_Manager():
         self.style.map("Danger.TButton",
                 relief=[("pressed", "sunken"), ("active", "raised")])
 
-        # ===== Treeview =====
         self.style.configure("Main.Treeview", rowheight=28)
         self.style.configure("Main.Treeview.Heading", font=("Segoe UI", 11, "bold"))

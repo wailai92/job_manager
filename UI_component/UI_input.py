@@ -17,26 +17,15 @@ class Input_manager:
         self.button_frame = ttk.Frame(parent)
         self.button_frame.pack(fill="x", padx=6, pady=(1,6))
 
-        # 變數
         self.category_var = tk.StringVar(value="None")
         self.name_var = tk.StringVar()
         self.prio_var = tk.StringVar(value="0")
-        #self.dead_var = tk.StringVar()  
         today = self.time_manager.get_date_today()
         self.year_var = tk.StringVar(value=str(today.year))
         self.month_var = tk.StringVar(value=str(today.month))
         self.day_var = tk.StringVar(value=str(today.day))
         self.time_var = tk.StringVar(value="23:59")  # 預設 23:59
         
-        
-        # 產生下拉日期清單（今天~往後 days_ahead 天）
-        #self.deadline_values = [
-            #(date.today() + timedelta(days=i)).strftime("%Y/%m/%d %H:%M")
-            #for i in range(days_ahead + 1)
-        #]
-        #self.dead_var.set(self.deadline_values[0])  # 預設今天
-        
-        # row 0
         ttk.Label(self.frame, text="catogory").grid(row=0, column=0, sticky="w", padx=6, pady=6)
         self.category_cb = ttk.Combobox(
             self.frame,
@@ -59,7 +48,6 @@ class Input_manager:
         )
         self.prio_cb.grid(row=0, column=5, sticky="w", padx=6, pady=6)
 
-        # Row 0: Deadline (Y/M/D) + Time
         ttk.Label(self.frame, text="Deadline").grid(row=0, column=6, sticky="w", padx=6, pady=6)
 
         year_from, year_to = self.time_manager.get_year_range()
@@ -100,10 +88,6 @@ class Input_manager:
         self.refresh_btn = ttk.Button(self.button_frame, text="Refresh", style="Primary.TButton")
         self.refresh_btn.grid(row=0, column=3, padx=0, pady=0)
 
-        # 讓 job name 那欄可伸縮
-        #self.frame.grid_columnconfigure(3, weight=1)
-
-        # 綁定年/月變動 → 更新日
         self.year_cb.bind("<<ComboboxSelected>>", self._on_year_month_change)
         self.month_cb.bind("<<ComboboxSelected>>", self._on_year_month_change)
     def _days_in_month(self, y, m):
@@ -117,8 +101,6 @@ class Input_manager:
 
         current_day = self.day_var.get()
         self.day_cb["values"] = days
-
-        # 如果原本的 day 不存在（例如 31 → 30），就改成最後一天
         if current_day not in days:
             self.day_var.set(days[-1])
     def bind_add(self, command):

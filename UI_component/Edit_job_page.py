@@ -17,7 +17,6 @@ class EditJobWindow(tk.Toplevel):
         self.job_id = job.id
         self.time_manager = Time_manager()
 
-        # ===== 變數 =====
         self.category_var = tk.StringVar(value=getattr(job, "category", "None"))
         #self.name_var = tk.StringVar(value=job.jobname)
         self.prio_var = tk.StringVar(value=str(job.priority))
@@ -73,7 +72,7 @@ class EditJobWindow(tk.Toplevel):
         self.bind("<Return>", lambda e: self._save())
         self.bind("<Escape>", lambda e: self.destroy())
         
-        self.transient(master)   # 依附主視窗
+        self.transient(master)   
         self.grab_set()          # 不先關不能點主視窗
         self.center_to_master(master)
 
@@ -94,12 +93,11 @@ class EditJobWindow(tk.Toplevel):
         self.on_save(self.job_id, self.category_var.get(), prio, deadline_ts)
         self.destroy()
     def center_to_master(self, master):
-        self.update_idletasks()  # 讓 Tk 把元件尺寸算好
+        self.update_idletasks()  
 
         w = self.winfo_width()
         h = self.winfo_height()
 
-        # master 在螢幕上的位置與大小
         mx = master.winfo_rootx()
         my = master.winfo_rooty()
         mw = master.winfo_width()

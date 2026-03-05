@@ -16,9 +16,10 @@ class Job:
             self.priority = priority
         self.deadline = deadline
         self.score = self.compute_score()
+        #self.dirty = True
 
     def compute_score(self) :
-        # 假設 deadline 是 timestamp
+        #deadline 是 timestamp
         time_remaining = max(self.deadline - time.time(), 0.0)
         
         P = MAX_PRIORITY - self.priority  
@@ -56,41 +57,47 @@ class Job_heap_deadline(heap):
 class Job_manager:
     def __init__(self):
         self.jobcount = 0
-        self.dict = {} #是job_by_id
-        #self.jobname_by_id = {}
+        self.dict = {}
         self.id_by_jobname = {}
         self.scoreheap = Job_heap_score()
         self.priorityheap = Job_heap_priority()
         self.deadlineheap = Job_heap_deadline()
-        #self.dirtycount = 0
-        #self.last_score_update = 0.0
+    def insert_with_id(self, job_id, jobname, priority, deadline, category="None"):
+        job_id = int(job_id)
+        if job_id > self.jobcount:
+            self.jobcount = job_id
+
+        newjob = Job(jobname, priority, deadline, job_id, category)
+        self.dict[job_id] = newjob
+
+        if jobname not in self.id_by_jobname:
+            self.id_by_jobname[jobname] = set()
+        self.id_by_jobname[jobname].add(job_id)
+
+        self.scoreheap.push(newjob)
+        self.priorityheap.push(newjob)
+        self.deadlineheap.push(newjob)
     def insert(self, jobname, priority, deadline, category):
         id = self.jobcount + 1
         self.jobcount += 1
         newjob = Job(jobname, priority, deadline, id, category)
         self.dict[id] = newjob
-        #self.jobname_by_id[id] = jobname
         if jobname not in self.id_by_jobname:
             self.id_by_jobname[jobname] = set()
         self.id_by_jobname[jobname].add(id)
         self.scoreheap.push(newjob)
         self.priorityheap.push(newjob)
         self.deadlineheap.push(newjob)
-        #self.dirtycount += 1
+        return id
     def delete(self, jobname):
-        #del self.dict[jobname]
         if jobname not in self.id_by_jobname:
             return
         ids = list(self.id_by_jobname.get(jobname, set()))
         for id in ids:
-            #del self.jobname_by_id[id] #先全刪除
-            #del self.dict[id] #chatgpt說穩定性差
             self.dict.pop(id, None)
-        #del self.id_by_jobname[jobname] #chatgpt說穩定性差
         self.id_by_jobname.pop(jobname, None)
-        #self.dirtycount += 1
     
-    def delete_by_id(self, job_id): #delete one at a time
+    def delete_by_id(self, job_id):
         job = self.dict.pop(job_id, None)
         if job is None:
             return
@@ -100,7 +107,7 @@ class Job_manager:
             self.id_by_jobname[name].discard(job_id)
             if not s:
                 self.id_by_jobname.pop(name, None)
-        return
+        return 
     def update_by_id(self, job_id, category, priority, deadline):
         job = self.dict.get(job_id)
         if job is not None:
@@ -114,14 +121,11 @@ class Job_manager:
             job.score = job.compute_score()
             self.scoreheap.push(job)
         self.scoreheap.set_version(version)
-        #self.dirtycount = 0
-        #self.last_score_update = time.time()
     def rebuild_heaps(self):
         self.scoreheap.heap.clear()
         self.priorityheap.heap.clear()
         self.deadlineheap.heap.clear()
         for job in self.dict.values():
-            # job.score 先確保是最新
             job.score = job.compute_score()
             self.scoreheap.push(job)
             self.priorityheap.push(job)
@@ -148,10 +152,6 @@ class Job_manager:
                 return id
             heapq.heappop(self.deadlineheap.heap)
         return None
-    #def get_dirtycount(self):
-        #return self.dirtycount
-    #def get_lastupdatetime(self):
-        #return self.last_score_update
     def search_job_by_id(self, job_id):
         job = self.dict.get(job_id)
         if job is not None: 
@@ -164,7 +164,7 @@ class Job_manager:
             joblist = []
             for id in ids:
                 job = self.dict.get(id)
-                if job is not None: #正常在兩個dictionary同步做好時，不會有None發生，但chatgpt還是建議保險起見這樣做
+                if job is not None: 
                     joblist.append(job)
             return joblist
         return []
@@ -185,7 +185,6 @@ class Job_manager:
 
         key_func = key_map[sort_by]
 
-        # score 預設高排前
         if sort_by == "score":
             return sorted(jobs, key=key_func, reverse=not reverse)
 
