@@ -1,5 +1,12 @@
 # job_manager
-This is a lightweight job manager
+This is a lightweight job manager.
+You can run the project by executing:
+
+python main.py
+
+or by double-clicking the executable:
+
+job_manager.exe
 
 #Features:
 
