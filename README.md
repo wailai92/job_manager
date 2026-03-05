@@ -10,7 +10,7 @@
     
     job_manager.exe
 
-#Features:
+# Features:
 
     -Add/delete/edit jobs
     
@@ -27,7 +27,7 @@
     -simple Tlinter Gui
     
 
-#Architecture:
+# Architecture:
 
     The system is divided into several components:
     
