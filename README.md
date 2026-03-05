@@ -53,6 +53,8 @@ job_manager.exe
         |- UI_component/
         
         |   |- frontend_manager.py
+
+        |   |- Edit_job_page.py
         
         |   |- UI_input.py
         
